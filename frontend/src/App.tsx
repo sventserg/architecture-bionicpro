@@ -1,23 +1,35 @@
-import React from 'react';
-import { ReactKeycloakProvider } from '@react-keycloak/web';
-import Keycloak, { KeycloakConfig } from 'keycloak-js';
+import React, { useEffect } from 'react';
 import ReportPage from './components/ReportPage';
 
-const keycloakConfig: KeycloakConfig = {
-  url: process.env.REACT_APP_KEYCLOAK_URL,
-  realm: process.env.REACT_APP_KEYCLOAK_REALM||"",
-  clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID||""
+const clearAuthState = () => {
+  console.log('🔄 Clearing auth state on app load');
+  try {
+    localStorage.removeItem('auth_state');
+    localStorage.removeItem('user_info');
+    sessionStorage.removeItem('auth_token');
+  } catch (error) {
+    console.log('No auth state to clear or storage not available');
+  }
 };
 
-const keycloak = new Keycloak(keycloakConfig);
-
 const App: React.FC = () => {
+  useEffect(() => {
+    clearAuthState();
+    const handleBeforeUnload = () => {
+      console.log('🧹 Cleaning up before page unload');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return (
-    <ReactKeycloakProvider authClient={keycloak}>
-      <div className="App">
-        <ReportPage />
-      </div>
-    </ReactKeycloakProvider>
+    <div className="App">
+      <ReportPage />
+    </div>
   );
 };
 

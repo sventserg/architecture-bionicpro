@@ -1,0 +1,5 @@
+apache-airflow-providers-postgres
+apache-airflow-providers-common-io
+clickhouse-driver
+clickhouse-connect
+psycopg2-binary
